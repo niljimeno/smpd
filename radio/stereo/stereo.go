@@ -38,6 +38,10 @@ func NewStereo() Stereo {
 	}
 }
 
+func (s *Stereo) isProcessValid() bool {
+	return (s.Current != nil && s.Current.Cmd != nil && s.Current.Cmd.Process != nil)
+}
+
 func (s *Stereo) Play(path string) error {
 	if len(os.Args) > 1 {
 		path = os.Args[1]
@@ -48,6 +52,10 @@ func (s *Stereo) Play(path string) error {
 	cmd := exec.Command("ffplay", "-nodisp", "-autoexit", "-nostats", path)
 	if err := cmd.Start(); err != nil {
 		return err
+	}
+
+	if s.isProcessValid() {
+		s.Current.Cmd.Process.Kill()
 	}
 
 	s.Current.Cmd = cmd
@@ -61,12 +69,8 @@ func (s *Stereo) Play(path string) error {
 	return nil
 }
 
-func (s *Stereo) isProcessValid() bool {
-	return (s.Current == nil || s.Current.Cmd == nil || s.Current.Cmd.Process == nil)
-}
-
 func (s *Stereo) Pause() bool {
-	if s.isProcessValid() {
+	if !s.isProcessValid() {
 		return false
 	}
 
@@ -80,7 +84,7 @@ func (s *Stereo) Pause() bool {
 }
 
 func (s *Stereo) Resume() bool {
-	if s.isProcessValid() {
+	if !s.isProcessValid() {
 		return false
 	}
 
@@ -94,7 +98,7 @@ func (s *Stereo) Resume() bool {
 }
 
 func (s *Stereo) Stop() bool {
-	if s.isProcessValid() {
+	if !s.isProcessValid() {
 		return false
 	}
 

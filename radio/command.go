@@ -1,6 +1,10 @@
 package radio
 
-import ()
+import (
+	"os"
+	"path"
+	"smpd/config"
+)
 
 func (r *Radio) Execute(command []string) string {
 	args := command[1:]
@@ -33,11 +37,16 @@ func (r *Radio) play(args []string) string {
 		return "err"
 	}
 
-	songName := args[0]
-	if songName == "venture.mp3" || songName == "venture" {
-		r.stereo.Play("./venture.mp3")
-		return "ok"
+	songPath := path.Join(config.MusicPath, args[0])
+	_, err := os.Stat(songPath)
+	if err != nil {
+		return "err"
 	}
 
-	return "not found"
+	err = r.stereo.Play(songPath)
+	if err != nil {
+		return "err - ffmpeg could not play"
+	}
+
+	return "ok"
 }

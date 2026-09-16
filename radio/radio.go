@@ -1,6 +1,9 @@
 package radio
 
-import "smpd/radio/stereo"
+import (
+	"fmt"
+	"smpd/radio/stereo"
+)
 
 type Track struct {
 	name string
@@ -20,7 +23,15 @@ type Radio struct {
 	stereo   stereo.Stereo
 }
 
+func trackSongEnd(ev *chan uint8) {
+	for {
+		<-*ev
+		fmt.Println("Song ended")
+	}
+}
+
 func NewRadio() Radio {
 	s := stereo.NewStereo()
+	go trackSongEnd(s.Events)
 	return Radio{stereo: s}
 }
