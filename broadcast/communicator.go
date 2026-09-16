@@ -3,6 +3,7 @@ package broadcast
 import (
 	"fmt"
 	"net"
+	"smpd/config"
 	"smpd/radio"
 	"strings"
 )
@@ -82,7 +83,7 @@ func dial(conn net.Conn, r *radio.Radio) {
 }
 
 func Listen(r *radio.Radio) {
-	ln, err := net.Listen("tcp", ":8080")
+	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Port))
 	if err != nil {
 		panic(err)
 	}
